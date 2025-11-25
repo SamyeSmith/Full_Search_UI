@@ -78,16 +78,16 @@ namespace FullSearch
 
         public bool IsEmpty() => Count == 0; // Check if the list is empty
 
-        public IEnumerator<T> GetEnumerator()
+        public IEnumerator<T> GetEnumerator() // Implement IEnumerable to allow iteration over the list
         {
-            var cur = head;
-            while (cur != null)
+            var cur = head; // Start from the head node
+            while (cur != null) // Traverse until the end of the list
             {
-                yield return cur.Data;
-                cur = cur.Next;
+                yield return cur.Data; // Yield the data of the current node - yield provides the next value in the iteration
+                cur = cur.Next; // Move to the next node
             }
         }
 
-        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator(); //GetEnumerator returns 
     }
 }
