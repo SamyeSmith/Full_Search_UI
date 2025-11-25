@@ -71,6 +71,7 @@ namespace FullSearch
 
                         if (pathfinder is AStar a) // If using A* algorithm, save additional info
                             w.WriteLine(a.OpenListSorts); // Write number of open list sorts
+                        w.WriteLine($"Total Path Length: {currentPath.Count}"); // Write total path length
                     }
 
                     txtOutput.AppendText($"\r\nSaved to: {saveDialog.FileName}\r\n"); // Indicate successful save
