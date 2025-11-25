@@ -53,21 +53,82 @@ namespace FullSearch
                 foreach (var c in currentPath)
                     txtOutput.AppendText(c.ToString() + "\r\n");
 
-                var outName = Path.GetFileNameWithoutExtension(loadedMapFile)
-                             + "Path_" + pathfinder.Name + ".txt";
 
-                using var w = new StreamWriter(outName);
-                foreach (var c in currentPath)
-                    w.WriteLine(c.ToString());
+                SaveFileDialog saveDialog = new SaveFileDialog();
+                saveDialog.Title = "Save Path File";
+                saveDialog.Filter = "Text Files (*.txt)|*.txt";
+                saveDialog.FileName = Path.GetFileNameWithoutExtension(loadedMapFile)
+                                        + "_Path_" + pathfinder.Name + ".txt";
 
-                if (pathfinder is AStar a)
-                    w.WriteLine(a.OpenListSorts);
+                if (saveDialog.ShowDialog() == DialogResult.OK)
+                {
+                    using (var w = new StreamWriter(saveDialog.FileName))
+                    {
+                        foreach (var c in currentPath)
+                            w.WriteLine($"{c.Row} {c.Col}");
 
-                txtOutput.AppendText($"\r\nSaved to: {outName}\r\n");
+                        if (pathfinder is AStar a)
+                            w.WriteLine(a.OpenListSorts);
+                    }
+
+                    txtOutput.AppendText($"\r\nSaved to: {saveDialog.FileName}\r\n");
+                }
+                else
+                {
+                    txtOutput.AppendText("\r\nSave cancelled.\r\n");
+                }
             }
 
-            panelGrid.Invalidate();  // redraw after loading
+            panelGrid.Invalidate();  // redraw with path
         }
+
+
+        //private void btnRun_Click(object sender, EventArgs e)
+        //{
+        //    // Ensure user has loaded a map
+        //    if (loadedMapFile == null)
+        //    {
+        //        MessageBox.Show("Load a map first.");
+        //        return;
+        //    }
+
+        //    // Load the map file chosen by the user
+        //    (terrain, start, goal) = LoadMap(loadedMapFile);
+
+        //    var algName = comboAlgorithm.SelectedItem.ToString();
+        //    if (!Enum.TryParse<Algorithm>(algName, out var alg))
+        //        alg = Algorithm.BreadthFirst;
+
+        //    var pathfinder = PathFinderFactory.NewPathFinder(alg);
+        //    currentPath = pathfinder.FindPath(terrain, start, goal);
+
+        //    txtOutput.Clear();
+
+        //    if (currentPath == null || currentPath.Count == 0)
+        //    {
+        //        txtOutput.AppendText("No path found.\r\n");
+        //    }
+        //    else
+        //    {
+        //        txtOutput.AppendText($"Path found ({currentPath.Count} steps):\r\n");
+        //        foreach (var c in currentPath)
+        //            txtOutput.AppendText(c.ToString() + "\r\n");
+
+        //        var outName = Path.GetFileNameWithoutExtension(loadedMapFile)
+        //                     + "Path_" + pathfinder.Name + ".txt";
+
+        //        using var w = new StreamWriter(outName);
+        //        foreach (var c in currentPath)
+        //            w.WriteLine(c.ToString());
+
+        //        if (pathfinder is AStar a)
+        //            w.WriteLine(a.OpenListSorts);
+
+        //        txtOutput.AppendText($"\r\nSaved to: {outName}\r\n");
+        //    }
+
+        //    panelGrid.Invalidate();  // redraw after loading
+        //}
 
         private void PanelGrid_Paint(object sender, PaintEventArgs e)
         {
