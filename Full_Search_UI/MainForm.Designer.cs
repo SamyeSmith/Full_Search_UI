@@ -83,7 +83,7 @@
             this.Controls.Add(this.lblAlg);
             this.Controls.Add(this.txtOutput);
             this.Name = "MainForm";
-            this.Text = "Full Search - WinForms (Option A, Merged)";
+            this.Text = "Full Search";
             this.ResumeLayout(false);
             this.PerformLayout();
         }

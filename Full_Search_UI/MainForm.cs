@@ -19,7 +19,7 @@ namespace FullSearch
             comboAlgorithm.Items.AddRange(Enum.GetNames(typeof(Algorithm)));
             comboAlgorithm.SelectedIndex = 0;
             panelGrid.Paint += PanelGrid_Paint;
-            panelGrid.Resize += (s,e)=> panelGrid.Invalidate();
+            panelGrid.Resize += (s, e) => panelGrid.Invalidate();
         }
 
         private void btnRun_Click(object sender, EventArgs e)
@@ -139,7 +139,7 @@ namespace FullSearch
             int w = panelGrid.ClientSize.Width, h = panelGrid.ClientSize.Height;
             float cellW = (float)w / cols, cellH = (float)h / rows;
 
-            var pathSet = new HashSet<(int,int)>();
+            var pathSet = new HashSet<(int, int)>();
             if (currentPath != null) foreach (var p in currentPath) pathSet.Add((p.Row, p.Col));
 
             for (int r = 0; r < rows; r++)
@@ -147,7 +147,7 @@ namespace FullSearch
                 for (int c = 0; c < cols; c++)
                 {
                     var rect = new RectangleF(c * cellW, r * cellH, cellW, cellH);
-                    Color fill = terrain[r,c] switch
+                    Color fill = terrain[r, c] switch
                     {
                         0 => Color.Black,
                         1 => Color.White,
@@ -160,15 +160,15 @@ namespace FullSearch
 
                     if (start.Row == r && start.Col == c)
                     {
-                        g.FillEllipse(Brushes.Orange, RectangleF.Inflate(rect, -cellW*0.2f, -cellH*0.2f));
+                        g.FillEllipse(Brushes.Orange, RectangleF.Inflate(rect, -cellW * 0.2f, -cellH * 0.2f));
                     }
                     else if (goal.Row == r && goal.Col == c)
                     {
-                        g.FillEllipse(Brushes.Red, RectangleF.Inflate(rect, -cellW*0.2f, -cellH*0.2f));
+                        g.FillEllipse(Brushes.Red, RectangleF.Inflate(rect, -cellW * 0.2f, -cellH * 0.2f));
                     }
-                    else if (pathSet.Contains((r,c)))
+                    else if (pathSet.Contains((r, c)))
                     {
-                        g.FillRectangle(Brushes.Yellow, RectangleF.Inflate(rect, -cellW*0.15f, -cellH*0.15f));
+                        g.FillRectangle(Brushes.Yellow, RectangleF.Inflate(rect, -cellW * 0.15f, -cellH * 0.15f));
                     }
                 }
             }
@@ -188,27 +188,118 @@ namespace FullSearch
 
                 txtOutput.Text = $"Loaded map: {Path.GetFileName(loadedMapFile)}";
 
-                panelGrid.Invalidate();   // <= ⭐ THIS DRAWS THE GRID NOW
+                panelGrid.Invalidate(); 
             }
         }
 
-
+        
         private (int[,], Coord, Coord) LoadMap(string filename)
         {
-            var lines = File.ReadAllLines(filename);
-            var dims = lines[0].Split(' ', StringSplitOptions.RemoveEmptyEntries);
-            int rows = int.Parse(dims[0]), cols = int.Parse(dims[1]);
-            var startParts = lines[1].Split(' ', StringSplitOptions.RemoveEmptyEntries);
-            var goalParts = lines[2].Split(' ', StringSplitOptions.RemoveEmptyEntries);
-            var start = new Coord(int.Parse(startParts[0]), int.Parse(startParts[1]));
-            var goal = new Coord(int.Parse(goalParts[0]), int.Parse(goalParts[1]));
-            var terrain = new int[rows, cols];
-            for (int r = 0; r < rows; r++)
+            try
             {
-                var rowparts = lines[3 + r].Split(' ', StringSplitOptions.RemoveEmptyEntries);
-                for (int c = 0; c < cols; c++) terrain[r, c] = int.Parse(rowparts[c]);
+                var lines = File.ReadAllLines(filename);
+
+                
+                if (lines.Length < 3)
+                {
+                    MessageBox.Show("Map file is too short. It must include dimensions, start, goal, and terrain rows.",
+                        "Invalid Map File", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return (null, new Coord(), new Coord());
+                }
+
+                
+                var dims = lines[0].Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                if (dims.Length != 2 ||
+                    !int.TryParse(dims[0], out int rows) ||
+                    !int.TryParse(dims[1], out int cols))
+                {
+                    MessageBox.Show("First line must contain two integers: ROWS COLS.",
+                        "Invalid Map File", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return (null, new Coord(), new Coord());
+                }
+
+                
+                var startParts = lines[1].Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                if (startParts.Length != 2 ||
+                    !int.TryParse(startParts[0], out int sRow) ||
+                    !int.TryParse(startParts[1], out int sCol))
+                {
+                    MessageBox.Show("Second line must contain: START_ROW START_COL.",
+                        "Invalid Map File", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return (null, new Coord(), new Coord());
+                }
+
+                
+                var goalParts = lines[2].Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                if (goalParts.Length != 2 ||
+                    !int.TryParse(goalParts[0], out int gRow) ||
+                    !int.TryParse(goalParts[1], out int gCol))
+                {
+                    MessageBox.Show("Third line must contain: GOAL_ROW GOAL_COL.",
+                        "Invalid Map File", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return (null, new Coord(), new Coord());
+                }
+
+                
+                if (lines.Length < 3 + rows)
+                {
+                    MessageBox.Show($"Map file does not contain enough terrain rows. Expected {rows}.",
+                        "Invalid Map File", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return (null, new Coord(), new Coord());
+                }
+
+                var terrain = new int[rows, cols];
+
+               
+                for (int r = 0; r < rows; r++)
+                {
+                    var rowparts = lines[3 + r].Split(' ', StringSplitOptions.RemoveEmptyEntries);
+
+                    if (rowparts.Length != cols)
+                    {
+                        MessageBox.Show($"Row {r + 4} does not contain {cols} values.",
+                            "Invalid Map File", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return (null, new Coord(), new Coord());
+                    }
+
+                    for (int c = 0; c < cols; c++)
+                    {
+                        if (!int.TryParse(rowparts[c], out int val))
+                        {
+                            MessageBox.Show($"Invalid terrain value at row {r + 4}, column {c + 1}.",
+                                "Invalid Map File", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            return (null, new Coord(), new Coord());
+                        }
+
+                        terrain[r, c] = val;
+                    }
+                }
+
+                
+                if (sRow < 0 || sRow >= rows || sCol < 0 || sCol >= cols)
+                {
+                    MessageBox.Show("Start position is outside the grid.",
+                        "Invalid Map File", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return (null, new Coord(), new Coord());
+                }
+
+                if (gRow < 0 || gRow >= rows || gCol < 0 || gCol >= cols)
+                {
+                    MessageBox.Show("Goal position is outside the grid.",
+                        "Invalid Map File", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return (null, new Coord(), new Coord());
+                }
+
+                
+                return (terrain, new Coord(sRow, sCol), new Coord(gRow, gCol));
             }
-            return (terrain, start, goal);
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error loading map:\n" + ex.Message,
+                    "Map Load Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return (null, new Coord(), new Coord());
+            }
         }
+
     }
 }
