@@ -55,27 +55,28 @@ namespace FullSearch
             var node = new LinkedListNode<T>(item); // Create a new node
             if (head == null)
             {
-                head = tail = node;
+                head = tail = node; // If the list is empty, set both head and tail to the new node
             }
             else
             {
-                node.Next = head;
-                head = node;
+                node.Next = head; // Link the new node to the current head
+                head = node; // Update the head to the new node
             }
             Count++;
         }
 
+        // pop the first item from the list
         public T RemoveFirst()
         {
-            if (head == null) throw new InvalidOperationException("List empty");
-            var val = head.Data;
-            head = head.Next;
-            if (head == null) tail = null;
-            Count--;
-            return val;
+            if (head == null) throw new InvalidOperationException("List empty"); // If the list is empty, throw an exception
+            var val = head.Data; // Store the data of the head node
+            head = head.Next; // Move the head pointer to the next node
+            if (head == null) tail = null; // If the list is now empty, set tail to null
+            Count--; 
+            return val; // Return the data of the removed node
         }
 
-        public bool IsEmpty() => Count == 0;
+        public bool IsEmpty() => Count == 0; // Check if the list is empty
 
         public IEnumerator<T> GetEnumerator()
         {
