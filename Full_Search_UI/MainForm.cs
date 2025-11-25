@@ -7,11 +7,12 @@ using System.Windows.Forms;
 
 namespace FullSearch
 {
+    // Main form for the pathfinding application
     public partial class MainForm : Form
     {
-        private int[,] terrain = null;
-        private Coord start, goal;
-        private List<Coord> currentPath = null;
+        private int[,] terrain = null; // 2D array representing the terrain grid
+        private Coord start, goal; // start and goal coordinates
+        private List<Coord> currentPath = null; // current path found by the algorithm
 
         public MainForm()
         {
@@ -82,54 +83,6 @@ namespace FullSearch
             panelGrid.Invalidate();  // redraw with path
         }
 
-
-        //private void btnRun_Click(object sender, EventArgs e)
-        //{
-        //    // Ensure user has loaded a map
-        //    if (loadedMapFile == null)
-        //    {
-        //        MessageBox.Show("Load a map first.");
-        //        return;
-        //    }
-
-        //    // Load the map file chosen by the user
-        //    (terrain, start, goal) = LoadMap(loadedMapFile);
-
-        //    var algName = comboAlgorithm.SelectedItem.ToString();
-        //    if (!Enum.TryParse<Algorithm>(algName, out var alg))
-        //        alg = Algorithm.BreadthFirst;
-
-        //    var pathfinder = PathFinderFactory.NewPathFinder(alg);
-        //    currentPath = pathfinder.FindPath(terrain, start, goal);
-
-        //    txtOutput.Clear();
-
-        //    if (currentPath == null || currentPath.Count == 0)
-        //    {
-        //        txtOutput.AppendText("No path found.\r\n");
-        //    }
-        //    else
-        //    {
-        //        txtOutput.AppendText($"Path found ({currentPath.Count} steps):\r\n");
-        //        foreach (var c in currentPath)
-        //            txtOutput.AppendText(c.ToString() + "\r\n");
-
-        //        var outName = Path.GetFileNameWithoutExtension(loadedMapFile)
-        //                     + "Path_" + pathfinder.Name + ".txt";
-
-        //        using var w = new StreamWriter(outName);
-        //        foreach (var c in currentPath)
-        //            w.WriteLine(c.ToString());
-
-        //        if (pathfinder is AStar a)
-        //            w.WriteLine(a.OpenListSorts);
-
-        //        txtOutput.AppendText($"\r\nSaved to: {outName}\r\n");
-        //    }
-
-        //    panelGrid.Invalidate();  // redraw after loading
-        //}
-
         private void PanelGrid_Paint(object sender, PaintEventArgs e)
         {
             var g = e.Graphics;
@@ -188,18 +141,18 @@ namespace FullSearch
 
                 txtOutput.Text = $"Loaded map: {Path.GetFileName(loadedMapFile)}";
 
-                panelGrid.Invalidate(); 
+                panelGrid.Invalidate();
             }
         }
 
-        
+
         private (int[,], Coord, Coord) LoadMap(string filename)
         {
             try
             {
                 var lines = File.ReadAllLines(filename);
 
-                
+
                 if (lines.Length < 3)
                 {
                     MessageBox.Show("Map file is too short. It must include dimensions, start, goal, and terrain rows.",
@@ -207,7 +160,7 @@ namespace FullSearch
                     return (null, new Coord(), new Coord());
                 }
 
-                
+
                 var dims = lines[0].Split(' ', StringSplitOptions.RemoveEmptyEntries);
                 if (dims.Length != 2 ||
                     !int.TryParse(dims[0], out int rows) ||
@@ -218,7 +171,7 @@ namespace FullSearch
                     return (null, new Coord(), new Coord());
                 }
 
-                
+
                 var startParts = lines[1].Split(' ', StringSplitOptions.RemoveEmptyEntries);
                 if (startParts.Length != 2 ||
                     !int.TryParse(startParts[0], out int sRow) ||
@@ -229,7 +182,7 @@ namespace FullSearch
                     return (null, new Coord(), new Coord());
                 }
 
-                
+
                 var goalParts = lines[2].Split(' ', StringSplitOptions.RemoveEmptyEntries);
                 if (goalParts.Length != 2 ||
                     !int.TryParse(goalParts[0], out int gRow) ||
@@ -240,7 +193,7 @@ namespace FullSearch
                     return (null, new Coord(), new Coord());
                 }
 
-                
+
                 if (lines.Length < 3 + rows)
                 {
                     MessageBox.Show($"Map file does not contain enough terrain rows. Expected {rows}.",
@@ -250,7 +203,7 @@ namespace FullSearch
 
                 var terrain = new int[rows, cols];
 
-               
+
                 for (int r = 0; r < rows; r++)
                 {
                     var rowparts = lines[3 + r].Split(' ', StringSplitOptions.RemoveEmptyEntries);
@@ -275,7 +228,7 @@ namespace FullSearch
                     }
                 }
 
-                
+
                 if (sRow < 0 || sRow >= rows || sCol < 0 || sCol >= cols)
                 {
                     MessageBox.Show("Start position is outside the grid.",
@@ -290,7 +243,7 @@ namespace FullSearch
                     return (null, new Coord(), new Coord());
                 }
 
-                
+
                 return (terrain, new Coord(sRow, sCol), new Coord(gRow, gCol));
             }
             catch (Exception ex)
@@ -301,5 +254,9 @@ namespace FullSearch
             }
         }
 
+        private void comboAlgorithm_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+        }
     }
 }

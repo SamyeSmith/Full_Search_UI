@@ -5,49 +5,54 @@ using System.Collections.Generic;
 namespace FullSearch
 {
     // Linked list node, using T as the data type
-    public class LinkedListNode<T>
+    public class LinkedListNode<T> // This is the element equivilent
     {
         public T Data { get; set; } // Data stored in the node
+        // Pointer to the next node
         public LinkedListNode<T> Next 
         {
             get; set; 
-        } // Pointer to the next node
+        }
+        // Constructor to initialize the node with data
         public LinkedListNode(T data) 
         {
             Data = data; Next = null; 
-        } // Constructor
+        }
     }
 
+    // Linked list class implementing IEnumerable for iteration
     public class LinkedList<T> : IEnumerable<T>
     {
-        private LinkedListNode<T> head;
-        private LinkedListNode<T> tail;
-        public int Count { get; private set; }
+        private LinkedListNode<T> head; // Pointer to the first node
+        private LinkedListNode<T> tail; // Pointer to the last node
+        public int Count { get; private set; } // Number of elements in the list
 
+        // Constructor to initialize an empty list
         public LinkedList()
         {
             head = tail = null;
             Count = 0;
         }
 
+        // Add an item to the end of the list
         public void AddLast(T item)
         {
-            var node = new LinkedListNode<T>(item);
-            if (tail == null)
+            var node = new LinkedListNode<T>(item); // Create a new node
+            if (tail == null) // If the list is empty
             {
-                head = tail = node;
+                head = tail = node; // Set both head and tail to the new node
             }
-            else
+            else // If the list is not empty
             {
-                tail.Next = node;
-                tail = node;
+                tail.Next = node; // Link the new node at the end
+                tail = node; // Update the tail to the new node
             }
-            Count++;
+            Count++; // Increment the count
         }
 
-        public void AddFirst(T item)
+        public void AddFirst(T item) // Add an item to the beginning of the list
         {
-            var node = new LinkedListNode<T>(item);
+            var node = new LinkedListNode<T>(item); // Create a new node
             if (head == null)
             {
                 head = tail = node;

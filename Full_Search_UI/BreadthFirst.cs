@@ -4,15 +4,15 @@ namespace FullSearch
 {
     public class BreadthFirst : IPathFinder
     {
-        public string Name => "BreadthFirst";
+        public string Name => "BreadthFirst"; // name for for display 
 
-        public List<Coord> FindPath(int[,] terrain, Coord start, Coord goal)
+        public List<Coord> FindPath(int[,] terrain, Coord start, Coord goal) // returns list of coordinates from start to goal
         {
-            int rows = terrain.GetLength(0), cols = terrain.GetLength(1);
-            var visited = new bool[rows, cols];
-            var q = new Queue<SearchNode>();
-            var startNode = new SearchNode(start);
-            q.Enqueue(startNode);
+            int rows = terrain.GetLength(0), cols = terrain.GetLength(1); // dimensions of terrain
+            var visited = new bool[rows, cols]; // track visited positions
+            var q = new Queue<SearchNode>(); // queue for BFS
+            var startNode = new SearchNode(start); // create start node
+            q.Enqueue(startNode); // enqueue start node
             visited[start.Row, start.Col] = true;
 
             while (!q.IsEmpty())
