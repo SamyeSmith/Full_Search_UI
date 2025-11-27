@@ -22,13 +22,17 @@ namespace FullSearch
         public static List<Coord> BuildPathList(SearchNode endNode) // Reconstruct the path from the end node to the start node.
         {
             var path = new List<Coord>(); // List to hold the path coordinates
+
             var node = endNode; // Start from the end node
+
             while (node != null) // Traverse back to the start node
             {
                 path.Add(node.Position); // Add the current node's position to the path
+
                 node = node.Predecessor; // Move to the predecessor node
             }
             path.Reverse(); // Reverse the path to get it from start to end
+
             return path; // Return the constructed path
         }
     }

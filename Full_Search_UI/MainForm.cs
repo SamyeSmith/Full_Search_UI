@@ -56,6 +56,8 @@ namespace FullSearch
                     txtOutput.AppendText(c.ToString() + "\r\n"); // Output coordinate
 
 
+                ///Save path to file and additional A* info if applicable\\\
+
                 SaveFileDialog saveDialog = new SaveFileDialog(); // Prompt user to save the path to a file
                 saveDialog.Title = "Save Path File";
                 saveDialog.Filter = "Text Files (*.txt)|*.txt"; // Only allow text files
@@ -85,6 +87,8 @@ namespace FullSearch
             panelGrid.Invalidate(); // Redraw the grid with the new path
         }
 
+
+        // Paint the terrain grid, start/goal positions, and path
         private void PanelGrid_Paint(object sender, PaintEventArgs e) // Paint event handler for grid panel
         {
             var g = e.Graphics; // Get graphics context
@@ -106,6 +110,7 @@ namespace FullSearch
                     var rect = new RectangleF(c * cellW, r * cellH, cellW, cellH); // Calculate cell rectangle
                     Color fill = terrain[r, c] switch // Determine fill color based on terrain type
                     {
+                        ///The colors for the map representations///
                         0 => Color.Black,
                         1 => Color.White,
                         2 => Color.LightGreen,
@@ -130,6 +135,7 @@ namespace FullSearch
                 }
             }
         }
+        /// Load a new map file when the "Load Map" button is clicked///
         private void btnLoadMap_Click(object sender, EventArgs e) // Event handler for "Load Map" button click
         {
             openMapDialog.Title = "Select map file"; // Set dialog title
@@ -150,6 +156,7 @@ namespace FullSearch
         }
 
 
+        /// load map from file and return terrain, start, and goal ///
         private (int[,], Coord, Coord) LoadMap(string filename) // Load map from file
         {
             try // Try to read and parse the map file
