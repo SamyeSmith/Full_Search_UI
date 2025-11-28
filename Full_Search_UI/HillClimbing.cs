@@ -1,41 +1,73 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 
 namespace FullSearch
 {
     public class HillClimbing : IPathFinder
     {
-        public string Name => "HillClimbing"; // the name of the algorithm
+        public string Name => "HillClimbing";
 
-        public List<Coord> FindPath(int[,] terrain, Coord start, Coord goal) // the main method to find a path
+        public List<Coord> FindPath(int[,] terrain, Coord start, Coord goal)
         {
-            int rows = terrain.GetLength(0), cols = terrain.GetLength(1); // get terrain dimensions
+            int rows = terrain.GetLength(0);
+            int cols = terrain.GetLength(1);
 
-            var current = new SearchNode(start); // initialize current node
+            // ----- Lists used for this version -----
+            var openList = new List<SearchNode>();     // nodes waiting to be checked
+            var closedList = new HashSet<Coord>();     // nodes already checked
+            var tempList = new List<SearchNode>();     // temporary neighbors
 
-            var visited = new HashSet<Coord> { start }; // track visited positions
+            // Start node
+            var current = new SearchNode(start);
+            openList.Add(current);
 
-            while (true) // main loop
+            while (openList.Count > 0)
             {
-                if (current.Position.Equals(goal)) return SearchUtilities.BuildPathList(current); // goal reached, build path
+                // Pop the first element from the open list
+                current = openList[0];
+                openList.RemoveAt(0);
+                closedList.Add(current.Position);
 
-                var neighbors = SearchUtilities.GetNeighbors(current.Position) // get neighbors
+                // Goal check
+                if (current.Position.Equals(goal))
+                    return SearchUtilities.BuildPathList(current);
 
-                    .Where(nb => nb.Row >= 0 && nb.Row < rows && nb.Col >= 0 && nb.Col < cols) // within bounds
+                // ----- Build temp list of neighbors -----
+                tempList.Clear();
 
-                    .Where(nb => terrain[nb.Row, nb.Col] != 0 && !visited.Contains(nb)) // passable and not visited
+                foreach (var nb in SearchUtilities.GetNeighbors(current.Position))
+                {
+                    // in bounds?
+                    if (nb.Row < 0 || nb.Row >= rows || nb.Col < 0 || nb.Col >= cols)
+                        continue;
 
-                    .Select(nb => new SearchNode(nb) { HCost = SearchUtilities.Manhattan(nb, goal), Predecessor = current }) // create nodes
+                    // blocked or already closed?
+                    if (terrain[nb.Row, nb.Col] == 0 || closedList.Contains(nb))
+                        continue;
 
-                    .OrderBy(n => n.HCost) // sort by heuristic cost
+                    // create a neighbor node
+                    var node = new SearchNode(nb)
+                    {
+                        Predecessor = current,
+                        HCost = SearchUtilities.Manhattan(nb, goal)
+                    };
 
-                    .ToList(); // convert to list
+                    tempList.Add(node);
+                }
 
-                if (neighbors.Count == 0) return new List<Coord>(); // no more neighbors, return empty path
+                // if no neighbors → stuck
+                if (tempList.Count == 0)
+                    return new List<Coord>();
 
-                current = neighbors.First(); // move to the best neighbor
-                visited.Add(current.Position); // mark as visited
+                // ----- Hill climbing chooses only the best neighbor -----
+                var best = tempList.OrderBy(n => n.HCost).First();
+
+                // Open list only gets 1 item → the best one
+                openList.Clear();
+                openList.Add(best);
             }
+
+            return new List<Coord>(); // no path
         }
     }
 }
