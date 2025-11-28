@@ -10,9 +10,13 @@ namespace FullSearch
         public List<Coord> FindPath(int[,] terrain, Coord start, Coord goal)
         {
             int rows = terrain.GetLength(0), cols = terrain.GetLength(1); // get dimensions of the terrain
+
             var visited = new bool[rows, cols]; // track visited nodes
+
             var open = new PriorityQueue(); // priority queue for open nodes
+
             var startNode = new SearchNode(start) { HCost = SearchUtilities.Manhattan(start, goal) }; // create start node with manhattan cost
+
             open.Enqueue(startNode); // add start node to open list
 
             while (!open.IsEmpty()) // main loop, with while acting as error prevention
@@ -26,8 +30,11 @@ namespace FullSearch
                 foreach (var nb in SearchUtilities.GetNeighbors(node.Position)) // explore neighbors
                 {
                     if (nb.Row < 0 || nb.Row >= rows || nb.Col < 0 || nb.Col >= cols) continue; // skip out-of-bounds
+
                     if (terrain[nb.Row, nb.Col] == 0) continue; // skip non-traversable terrain
+
                     if (visited[nb.Row, nb.Col]) continue; // skip already visited
+
                     var newNode = new SearchNode(nb) { Predecessor = node, HCost = SearchUtilities.Manhattan(nb, goal) }; // create new node for neighbor
                     open.Enqueue(newNode); // add neighbor to open list
                 }

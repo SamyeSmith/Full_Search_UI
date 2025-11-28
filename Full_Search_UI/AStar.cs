@@ -11,8 +11,11 @@ namespace FullSearch
         public List<Coord> FindPath(int[,] terrain, Coord start, Coord goal)
         {
             int rows = terrain.GetLength(0), cols = terrain.GetLength(1); // Get dimensions of the terrain
+
             var closed = new bool[rows, cols]; // Closed list to track visited nodes
+
             var open = new PriorityQueue(); // Open list as a priority queue
+
             var startNode = new SearchNode(start) { GCost = 0, HCost = SearchUtilities.Manhattan(start, goal) }; // Initialize start node
             open.Enqueue(startNode); // Add start node to open list
 

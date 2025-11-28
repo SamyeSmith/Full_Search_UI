@@ -16,6 +16,7 @@ namespace FullSearch
             var stack = new Stack<SearchNode>(); // stack for DFS
 
             var startNode = new SearchNode(start); // starting node
+
             stack.Push(startNode); // push start node onto stack
 
             while (!stack.IsEmpty()) // main DFS loop, with while acting as error prevention
