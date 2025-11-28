@@ -25,7 +25,7 @@ namespace FullSearch
                 var node = q.Dequeue();
                 if (node.Position.Equals(goal)) return SearchUtilities.BuildPathList(node);
 
-                foreach (var nb in SearchUtilities.GetNeighbors(node.Position))
+                foreach (var nb in SearchUtilities.GetNeighbors(node.Position)) // explore using Search Utilities and Search Node classes. nb is the neighbor coord
                 {
                     if (nb.Row < 0 || nb.Row >= rows || nb.Col < 0 || nb.Col >= cols) continue; // coords are out of the grid
 
@@ -39,7 +39,7 @@ namespace FullSearch
                 }
             }
 
-            return new List<Coord>(); // no path
+            return new List<Coord>(); // retrun the list to main program
         }
     }
 }
